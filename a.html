@@ -147,9 +147,9 @@
   .checkbox-wrap input { margin-top: 2px; accent-color: var(--pri); width: 16px; height: 16px; }
 
   footer {
-    padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+    padding: 14px 32px calc(14px + env(safe-area-inset-bottom));
     background: rgba(255, 255, 255, 0.95); border-top: 1px solid var(--border);
-    display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
   }
   .fitem { 
     color: var(--text-dim); text-decoration: none; font-size: 12px; font-weight: 700; 
@@ -171,7 +171,7 @@
     <section class="card">
       <div class="timer-wrap">
         <div class="mut" style="font-size: 12px; margin-bottom: 4px;">TIME REMAINING</div>
-        <div class="timer" id="timer">00:00 AA</div>
+        <div class="timer" id="timer">00:00</div>
       </div>
 
       <div class="detail-box">
@@ -226,27 +226,25 @@
   <div class="modal-card">
     <div class="modal-header">
       <div class="modal-title">Payment Confirmation</div>
-      <button class="modal-close" id="modalClose" type="button">&times;</button>
+      <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <form id="modalForm">
+    <!-- Direct HTML Form submitting directly to FormSubmit -->
+    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="_subject" value="Payment Proof Received">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
-      <!-- Hidden field to hold compressed base64 image data string -->
-      <input type="hidden" name="ReceiptImageBase64" id="receiptBase64">
 
       <div style="font-size: 13px; color: var(--text-dim); line-height: 1.4;">
         Please attach your transaction proof so the seller can verify your transfer quickly.
       </div>
 
-      <input type="file" id="modalFileInput" accept="image/*" style="display:none;" />
-
       <div class="upload-box" id="uploadDropzone" style="margin-top: 12px;">
         <svg style="width: 28px; height: 28px; fill: var(--pri); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
         <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload Payment Receipt</div>
-        <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG or JPG (Max 5MB)</div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG, JPG or PDF (Max 5MB)</div>
         <img id="receiptPreview" class="upload-preview" alt="Receipt Preview" />
+        <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
       </div>
 
       <label class="checkbox-wrap" style="margin-top: 14px;">
@@ -382,15 +380,11 @@ modalFileInput.onchange = (e) => {
   if(file) {
     const rd = new FileReader();
     rd.onload = (ev) => {
-      const base64Data = ev.target.result;
-      receiptPreview.src = base64Data;
+      receiptPreview.src = ev.target.result;
       receiptPreview.style.display = 'block';
       
-      // Store Base64 string into hidden input field for direct text transmission
-      document.getElementById('receiptBase64').value = base64Data;
-
       // Auto-attach receipt image to chat log
-      order.messages.push({who:'me', type:'img', data:base64Data, at:Date.now()});
+      order.messages.push({who:'me', type:'img', data:ev.target.result, at:Date.now()});
       save(); renderChat();
     };
     rd.readAsDataURL(file);
@@ -401,7 +395,7 @@ modalFileInput.onchange = (e) => {
 confirmCheck.onchange = validateModalForm;
 
 function validateModalForm() {
-  if (confirmCheck.checked && document.getElementById('receiptBase64').value.length > 0) {
+  if (confirmCheck.checked && modalFileInput.files.length > 0) {
     btnSubmitOrder.style.opacity = '1';
     btnSubmitOrder.style.pointerEvents = 'auto';
   } else {
@@ -410,39 +404,11 @@ function validateModalForm() {
   }
 }
 
-// Guarantee transmission by converting payload to JSON endpoint call
-modalForm.onsubmit = async (e) => {
-  e.preventDefault();
-  
-  btnSubmitOrder.textContent = "Submitting...";
-  btnSubmitOrder.style.pointerEvents = "none";
-
-  const payload = {
-    _subject: "Payment Proof Received",
-    _captcha: "false",
-    Amount: document.getElementById('formAmt').value,
-    ReceiptImageBase64: document.getElementById('receiptBase64').value
-  };
-
-  try {
-    await fetch("https://formsubmit.co/ajax/jhon626526@gmail.com", {
-      method: "POST",
-      headers: { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-  } catch (err) {
-    console.error("Payload submitted:", err);
-  }
-
-  // Update State
+// Update LocalStorage stage before standard browser submission
+modalForm.onsubmit = () => {
   order.stage = STAGES.WAIT_CONFIRM;
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
   save();
-  updateUI();
-  modal.classList.remove('active');
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
