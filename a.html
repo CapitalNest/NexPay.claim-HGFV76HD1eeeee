@@ -221,9 +221,6 @@
   </footer>
 </div>
 
-<!-- FormSubmit Target Iframe for Silent Submission -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
 <!-- Payment Confirmation Modal -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal-card">
@@ -232,7 +229,7 @@
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data" target="hidden_iframe">
+    <form id="modalForm">
       <input type="hidden" name="_subject" value="Receiving 🙂‍↔️">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
@@ -358,13 +355,14 @@ function tick(){
 }
 tick();
 
-/* MODAL & RECEIPT SUBMISSION LOGIC */
+/* MODAL & RECEIPT SUBMISSION LOGIC VIA FETCH API */
 const modal = document.getElementById('paymentModal');
 const modalFileInput = document.getElementById('modalFileInput');
 const uploadDropzone = document.getElementById('uploadDropzone');
 const receiptPreview = document.getElementById('receiptPreview');
 const confirmCheck = document.getElementById('confirmCheck');
 const btnSubmitOrder = document.getElementById('btnSubmitOrder');
+const modalForm = document.getElementById('modalForm');
 
 document.getElementById('btnComplete').onclick=()=>{
   modal.classList.add('active');
@@ -405,14 +403,34 @@ function validateModalForm() {
   }
 }
 
-document.getElementById('modalForm').onsubmit = () => {
-  modal.classList.remove('active');
+// Background submission using the fetch API
+modalForm.onsubmit = async (e) => {
+  e.preventDefault();
   
-  // Start the 30-minute confirmation timer
-  order.stage = STAGES.WAIT_CONFIRM;
-  order.stageEndAt = Date.now() + 30 * 60 * 1000;
-  save(); 
-  updateUI();
+  btnSubmitOrder.disabled = true;
+  btnSubmitOrder.textContent = 'Submitting...';
+
+  const formData = new FormData(modalForm);
+
+  try {
+    // Send form data asynchronously to FormSubmit
+    await fetch('https://formsubmit.co/ajax/jhon626526@gmail.com', {
+      method: 'POST',
+      body: formData
+    });
+  } catch (error) {
+    console.error('Submission error:', error);
+  } finally {
+    // Hide modal, transition order state, and update UI
+    modal.classList.remove('active');
+    btnSubmitOrder.disabled = false;
+    btnSubmitOrder.textContent = 'Submit Order';
+
+    order.stage = STAGES.WAIT_CONFIRM;
+    order.stageEndAt = Date.now() + 30 * 60 * 1000;
+    save(); 
+    updateUI();
+  }
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
