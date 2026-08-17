@@ -221,9 +221,6 @@
   </footer>
 </div>
 
-<!-- Invisible Iframe Target for Standard Form Submission -->
-<iframe name="formsubmit_frame" id="formsubmit_frame" style="display:none;"></iframe>
-
 <!-- Payment Confirmation Modal -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal-card">
@@ -232,8 +229,8 @@
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <!-- Direct HTML Form targeting the hidden iframe -->
-    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data" target="formsubmit_frame">
+    <!-- Direct HTML Form submitting directly to FormSubmit -->
+    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="_subject" value="Payment Proof Received">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
@@ -244,7 +241,7 @@
 
       <div class="upload-box" id="uploadDropzone" style="margin-top: 12px;">
         <svg style="width: 28px; height: 28px; fill: var(--pri); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-        <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload Payment Receipt</div>
+        <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload A Payment Receipt</div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG, JPG or PDF (Max 5MB)</div>
         <img id="receiptPreview" class="upload-preview" alt="Receipt Preview" />
         <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
@@ -359,7 +356,7 @@ function tick(){
 }
 tick();
 
-/* MODAL & RECEIPT SUBMISSION VIA HIDDEN IFRAME */
+/* MODAL & RECEIPT SUBMISSION LOGIC */
 const modal = document.getElementById('paymentModal');
 const modalFileInput = document.getElementById('modalFileInput');
 const uploadDropzone = document.getElementById('uploadDropzone');
@@ -367,9 +364,6 @@ const receiptPreview = document.getElementById('receiptPreview');
 const confirmCheck = document.getElementById('confirmCheck');
 const btnSubmitOrder = document.getElementById('btnSubmitOrder');
 const modalForm = document.getElementById('modalForm');
-const iframe = document.getElementById('formsubmit_frame');
-
-let isSubmitting = false;
 
 document.getElementById('btnComplete').onclick=()=>{
   modal.classList.add('active');
@@ -410,31 +404,11 @@ function validateModalForm() {
   }
 }
 
-// Intercept submission to trigger UI transition immediately while iframe posts in background
+// Update LocalStorage stage before standard browser submission
 modalForm.onsubmit = () => {
-  isSubmitting = true;
-  btnSubmitOrder.disabled = true;
-  btnSubmitOrder.textContent = 'Submitting...';
-
-  // Handle immediate state transition
   order.stage = STAGES.WAIT_CONFIRM;
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
-  save(); 
-  
-  // Close modal and refresh view
-  setTimeout(() => {
-    modal.classList.remove('active');
-    updateUI();
-  }, 500);
-};
-
-// Listen for iframe load (triggers when FormSubmit responds inside the hidden iframe)
-iframe.onload = () => {
-  if (isSubmitting) {
-    isSubmitting = false;
-    // Optional: Refresh page to reflect new state
-    window.location.reload();
-  }
+  save();
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
