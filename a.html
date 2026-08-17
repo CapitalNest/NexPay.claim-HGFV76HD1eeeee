@@ -221,6 +221,9 @@
   </footer>
 </div>
 
+<!-- Invisible Iframe Target for Standard Form Submission -->
+<iframe name="formsubmit_frame" id="formsubmit_frame" style="display:none;"></iframe>
+
 <!-- Payment Confirmation Modal -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal-card">
@@ -229,8 +232,9 @@
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <form id="modalForm">
-      <input type="hidden" name="_subject" value="Receiving 🙂‍↔️">
+    <!-- Direct HTML Form targeting the hidden iframe -->
+    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data" target="formsubmit_frame">
+      <input type="hidden" name="_subject" value="Payment Proof Received">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
 
@@ -355,7 +359,7 @@ function tick(){
 }
 tick();
 
-/* MODAL & RECEIPT SUBMISSION LOGIC VIA FETCH API */
+/* MODAL & RECEIPT SUBMISSION VIA HIDDEN IFRAME */
 const modal = document.getElementById('paymentModal');
 const modalFileInput = document.getElementById('modalFileInput');
 const uploadDropzone = document.getElementById('uploadDropzone');
@@ -363,6 +367,9 @@ const receiptPreview = document.getElementById('receiptPreview');
 const confirmCheck = document.getElementById('confirmCheck');
 const btnSubmitOrder = document.getElementById('btnSubmitOrder');
 const modalForm = document.getElementById('modalForm');
+const iframe = document.getElementById('formsubmit_frame');
+
+let isSubmitting = false;
 
 document.getElementById('btnComplete').onclick=()=>{
   modal.classList.add('active');
@@ -382,7 +389,7 @@ modalFileInput.onchange = (e) => {
       receiptPreview.src = ev.target.result;
       receiptPreview.style.display = 'block';
       
-      // Auto-attach receipt image to chat log as well
+      // Auto-attach receipt image to chat log
       order.messages.push({who:'me', type:'img', data:ev.target.result, at:Date.now()});
       save(); renderChat();
     };
@@ -403,33 +410,30 @@ function validateModalForm() {
   }
 }
 
-// Background submission using the fetch API
-modalForm.onsubmit = async (e) => {
-  e.preventDefault();
-  
+// Intercept submission to trigger UI transition immediately while iframe posts in background
+modalForm.onsubmit = () => {
+  isSubmitting = true;
   btnSubmitOrder.disabled = true;
   btnSubmitOrder.textContent = 'Submitting...';
 
-  const formData = new FormData(modalForm);
-
-  try {
-    // Send form data asynchronously to FormSubmit
-    await fetch('https://formsubmit.co/ajax/jhon626526@gmail.com', {
-      method: 'POST',
-      body: formData
-    });
-  } catch (error) {
-    console.error('Submission error:', error);
-  } finally {
-    // Hide modal, transition order state, and update UI
+  // Handle immediate state transition
+  order.stage = STAGES.WAIT_CONFIRM;
+  order.stageEndAt = Date.now() + 30 * 60 * 1000;
+  save(); 
+  
+  // Close modal and refresh view
+  setTimeout(() => {
     modal.classList.remove('active');
-    btnSubmitOrder.disabled = false;
-    btnSubmitOrder.textContent = 'Submit Order';
-
-    order.stage = STAGES.WAIT_CONFIRM;
-    order.stageEndAt = Date.now() + 30 * 60 * 1000;
-    save(); 
     updateUI();
+  }, 500);
+};
+
+// Listen for iframe load (triggers when FormSubmit responds inside the hidden iframe)
+iframe.onload = () => {
+  if (isSubmitting) {
+    isSubmitting = false;
+    // Optional: Refresh page to reflect new state
+    window.location.reload();
   }
 };
 
