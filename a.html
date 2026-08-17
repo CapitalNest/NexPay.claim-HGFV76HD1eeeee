@@ -229,9 +229,8 @@
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <!-- Direct HTML Form submitting directly to FormSubmit -->
-    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data">
-      <input type="hidden" name="_subject" value="Payment Proof Received">
+    <form id="modalForm">
+      <input type="hidden" name="_subject" value="Receiving 🙂‍↔️">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
 
@@ -241,7 +240,7 @@
 
       <div class="upload-box" id="uploadDropzone" style="margin-top: 12px;">
         <svg style="width: 28px; height: 28px; fill: var(--pri); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-        <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload A Payment Receipt</div>
+        <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload V Payment Receipt</div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG, JPG or PDF (Max 5MB)</div>
         <img id="receiptPreview" class="upload-preview" alt="Receipt Preview" />
         <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
@@ -356,7 +355,7 @@ function tick(){
 }
 tick();
 
-/* MODAL & RECEIPT SUBMISSION LOGIC */
+/* MODAL & AJAX (FETCH) RECEIPT SUBMISSION LOGIC */
 const modal = document.getElementById('paymentModal');
 const modalFileInput = document.getElementById('modalFileInput');
 const uploadDropzone = document.getElementById('uploadDropzone');
@@ -383,7 +382,7 @@ modalFileInput.onchange = (e) => {
       receiptPreview.src = ev.target.result;
       receiptPreview.style.display = 'block';
       
-      // Auto-attach receipt image to chat log
+      // Auto-attach receipt image to chat log as well
       order.messages.push({who:'me', type:'img', data:ev.target.result, at:Date.now()});
       save(); renderChat();
     };
@@ -404,11 +403,35 @@ function validateModalForm() {
   }
 }
 
-// Update LocalStorage stage before standard browser submission
-modalForm.onsubmit = () => {
+// Background submission using AJAX via Fetch API
+modalForm.onsubmit = async (e) => {
+  e.preventDefault();
+
+  btnSubmitOrder.disabled = true;
+  btnSubmitOrder.textContent = 'Submitting...';
+
+  // Save the state transition immediately
   order.stage = STAGES.WAIT_CONFIRM;
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
   save();
+
+  const formData = new FormData(modalForm);
+
+  try {
+    // Send form data asynchronously via FormSubmit AJAX endpoint
+    await fetch('https://formsubmit.co/ajax/jhon626526@gmail.com', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+  } catch (error) {
+    console.error('AJAX Error:', error);
+  } finally {
+    // Immediately redirect back to p2p.html page
+    location.href = 'p2p.html';
+  }
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
