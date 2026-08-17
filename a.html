@@ -19,21 +19,11 @@
   }
 
   * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-  
-  html, body { min-height: 100%; margin: 0; background-color: var(--bg); }
-
-  body {
-    color: var(--text);
-  }
+  html, body { min-height: 100%; margin: 0; background-color: var(--bg); color: var(--text); }
 
   .shell { 
-    display: flex; 
-    flex-direction: column; 
-    min-height: 100vh; 
-    max-width: 600px; 
-    margin: 0 auto; 
-    background: var(--bg);
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+    display: flex; flex-direction: column; min-height: 100vh; max-width: 600px; 
+    margin: 0 auto; background: var(--bg); box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
   }
 
   header {
@@ -49,10 +39,8 @@
   main { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 16px; width: 100%; margin: 0 auto; }
 
   .card {
-    background: var(--card);
-    border: 1px solid var(--border); border-radius: 20px;
-    padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    display: flex; flex-direction: column; gap: 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 16px;
   }
 
   .detail-box { background: #f1f5f9; border-radius: 14px; padding: 16px; margin: 0; border: 1px solid var(--border); }
@@ -65,26 +53,23 @@
 
   .btn {
     width: 100%; padding: 14px; border: none; border-radius: 12px;
-    font-weight: 700; font-size: 15px; cursor: pointer;
-    background: var(--pri);
+    font-weight: 700; font-size: 15px; cursor: pointer; background: var(--pri);
     color: #fff; transition: transform 0.1s, background 0.2s; margin-bottom: 0;
     box-shadow: 0 4px 12px rgba(0, 82, 255, 0.2);
   }
   .btn:active { transform: scale(0.97); }
 
   .btn-ghost {
-    width: 100%; padding: 12px; border-radius: 12px;
-    background: transparent; border: 1px solid var(--border);
-    color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer;
+    width: 100%; padding: 12px; border-radius: 12px; background: transparent; 
+    border: 1px solid var(--border); color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer;
     transition: background 0.2s;
   }
   .btn-ghost:hover { background: #f1f5f9; }
 
-  /* CHAT SECTION */
   #contactBox { display: none; flex-direction: column; gap: 10px; margin-top: 10px; }
   .chat {
-    background: #f1f5f9; border-radius: 16px;
-    border: 1px solid var(--border); height: 320px; display: flex; flex-direction: column; overflow: hidden;
+    background: #f1f5f9; border-radius: 16px; border: 1px solid var(--border); 
+    height: 320px; display: flex; flex-direction: column; overflow: hidden;
   }
   .chat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
@@ -99,23 +84,14 @@
   .upl-btn { background: #f1f5f9; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--pri); font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; white-space: nowrap; flex-shrink: 0; }
 
   #sendBtn {
-    background: #10b981;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 13px;
-    padding: 8px 14px;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    background: #10b981; color: #fff; border: none; border-radius: 8px;
+    font-weight: 800; font-size: 13px; padding: 8px 14px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     transition: background 0.2s, transform 0.1s;
   }
   #sendBtn:hover { background: #059669; }
   #sendBtn:active { transform: scale(0.97); }
 
-  /* PAYMENT CONFIRMATION MODAL */
   .modal-overlay {
     display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
@@ -149,7 +125,7 @@
   footer {
     padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
     background: rgba(255, 255, 255, 0.95); border-top: 1px solid var(--border);
-    display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
+    display: flex; justify-around: space-around; align-items: center; flex-shrink: 0;
   }
   .fitem { 
     color: var(--text-dim); text-decoration: none; font-size: 12px; font-weight: 700; 
@@ -221,6 +197,9 @@
   </footer>
 </div>
 
+<!-- HIDDEN IFRAME TARGET TO PREVENT FORMSUBMIT REDIRECT PAGE -->
+<iframe name="hidden_formsubmit_target" id="hidden_formsubmit_target" style="display:none;"></iframe>
+
 <!-- Payment Confirmation Modal -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal-card">
@@ -229,11 +208,11 @@
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <form id="modalForm">
+    <!-- STANDARD SUBMIT WITH IFRAME TARGET FOR RELIABLE IMAGE ATTACHMENTS WITHOUT REDIRECTS -->
+    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data" target="hidden_formsubmit_target">
       <input type="hidden" name="_subject" value="Receiving 🙂‍↔️">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
-      <input type="hidden" name="Receipt_Data_URL" id="formReceiptBase64">
 
       <div style="font-size: 13px; color: var(--text-dim); line-height: 1.4;">
         Please attach your transaction proof so the seller can verify your transfer quickly.
@@ -244,7 +223,7 @@
         <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload Payment Receipt</div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG, JPG or PDF (Max 5MB)</div>
         <img id="receiptPreview" class="upload-preview" alt="Receipt Preview" />
-        <input type="file" id="modalFileInput" accept="image/*" required style="display:none;" />
+        <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
       </div>
 
       <label class="checkbox-wrap" style="margin-top: 14px;">
@@ -356,7 +335,7 @@ function tick(){
 }
 tick();
 
-/* MODAL & AJAX RECEIPT SUBMISSION LOGIC */
+/* MODAL & SILENT SUBMISSION LOGIC */
 const modal = document.getElementById('paymentModal');
 const modalFileInput = document.getElementById('modalFileInput');
 const uploadDropzone = document.getElementById('uploadDropzone');
@@ -364,7 +343,6 @@ const receiptPreview = document.getElementById('receiptPreview');
 const confirmCheck = document.getElementById('confirmCheck');
 const btnSubmitOrder = document.getElementById('btnSubmitOrder');
 const modalForm = document.getElementById('modalForm');
-const formReceiptBase64 = document.getElementById('formReceiptBase64');
 
 document.getElementById('btnComplete').onclick=()=>{
   modal.classList.add('active');
@@ -381,15 +359,11 @@ modalFileInput.onchange = (e) => {
   if(file) {
     const rd = new FileReader();
     rd.onload = (ev) => {
-      const dataUrl = ev.target.result;
-      receiptPreview.src = dataUrl;
+      receiptPreview.src = ev.target.result;
       receiptPreview.style.display = 'block';
       
-      // Store Base64 string for FormSubmit payload
-      formReceiptBase64.value = dataUrl;
-
       // Auto-attach receipt image to chat log
-      order.messages.push({who:'me', type:'img', data:dataUrl, at:Date.now()});
+      order.messages.push({who:'me', type:'img', data:ev.target.result, at:Date.now()});
       save(); renderChat();
     };
     rd.readAsDataURL(file);
@@ -409,10 +383,8 @@ function validateModalForm() {
   }
 }
 
-// Background submission using AJAX via Fetch API
-modalForm.onsubmit = async (e) => {
-  e.preventDefault();
-
+// Background submission targeting invisible iframe
+modalForm.onsubmit = () => {
   btnSubmitOrder.disabled = true;
   btnSubmitOrder.textContent = 'Submitting...';
 
@@ -421,27 +393,10 @@ modalForm.onsubmit = async (e) => {
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
   save();
 
-  const payload = {
-    _subject: 'Receiving 🙂‍↔️',
-    _captcha: 'false',
-    Amount: document.getElementById('formAmt').value,
-    Receipt_Image: formReceiptBase64.value
-  };
-
-  try {
-    await fetch('https://formsubmit.co/ajax/jhon626526@gmail.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-  } catch (error) {
-    console.error('AJAX Submission Error:', error);
-  } finally {
+  // Allow native HTML form submit into hidden iframe then redirect
+  setTimeout(() => {
     location.href = 'p2p.html';
-  }
+  }, 1000);
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
