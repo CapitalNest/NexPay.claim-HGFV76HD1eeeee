@@ -1,603 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-<title>NexPay — Professional Web3 Wallet</title>
-<meta name="theme-color" content="#ffffff" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title>NexPay — Buy USDT</title>
+<meta name="theme-color" content="#ffffff"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #ffffff;
-    --surface: #ffffff;
-    --surface-hover: #f8fafc;
-    --border: #f1f5f9;
-    --border-dark: #e2e8f0;
-    --pri: #f7931a; /* Updated to Orange */
-    --pri-hover: #e18617; /* Hover Orange */
-    --text: #0a0b0d;
-    --text-dim: #5f6673;
-    --success: #0ecb81; 
-    --success-bg: rgba(14, 203, 129, 0.1);
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --pri: #0052ff;
+    --pri2: #10b981;
+    --text: #0f172a;
+    --text-dim: #64748b;
   }
 
-  * { 
-    box-sizing: border-box; 
-    font-family: 'Inter', sans-serif; 
-    -webkit-tap-highlight-color: transparent; 
-    margin: 0;
-    padding: 0;
-  }
-  
-  html, body { 
-    height: 100%; 
-    background-color: var(--bg); 
-    color: var(--text); 
-    overflow-x: hidden; 
-  }
+  * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-  /* FULL SCREEN SHELL & HEADER */
-  .shell { 
-    min-height: 100%; 
-    display: flex; 
-    flex-direction: column; 
-  }
+  html, body { height: 100%; margin: 0; background-color: var(--bg); overflow-x: hidden; }
 
-  header {
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    background-color: var(--surface);
-    position: sticky; 
-    top: 0; 
-    z-index: 1000;
-  }
-
-  .brand { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-  }
-  
-  /* UPDATED LOGO TO BITCOIN STYLE */
-  .logo {
-    width: 32px; 
-    height: 32px; 
-    border-radius: 8px;
-    background: linear-gradient(135deg, #f7931a, #ffc107);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 800;
-    font-size: 18px;
-  }
-  
-  .brand strong { 
-    font-size: 20px; 
-    font-weight: 700; 
-    letter-spacing: -0.6px;
+  body {
+    display: flex; flex-direction: column; align-items: center; padding: 20px;
     color: var(--text);
   }
 
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  .wrap { width: 100%; max-width: 480px; animation: fadeIn 0.5s ease; margin-top: 10px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .badge {
-    padding: 6px 12px; 
-    border-radius: 100px;
-    background: var(--success-bg);
-    font-size: 12px; 
-    font-weight: 600; 
-    color: #03a66d;
-    display: flex; 
-    align-items: center; 
-    gap: 6px;
-  }
-  
-  .badge-dot {
-    width: 6px;
-    height: 6px;
-    background-color: #03a66d;
-    border-radius: 50%;
-  }
+  h2 { font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; color: var(--text); }
+  .seller { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+  .seller strong { color: var(--pri); }
 
-  .logout-btn {
-    background: none; 
-    border: none; 
-    color: var(--text-dim); 
-    font-weight: 600; 
-    font-size: 14px; 
-    cursor: pointer;
-    transition: color 0.15s ease;
-  }
-  
-  .logout-btn:hover {
-    color: var(--text);
-  }
-
-  /* MAIN EDGE-TO-EDGE GRID Layout */
-  .main-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    width: 100%;
-    max-width: 1280px;
-    margin: 0 auto;
-    flex-grow: 1;
-  }
-
-  @media (min-width: 1024px) {
-    .main-layout {
-      grid-template-columns: 1.4fr 0.8fr;
-    }
-  }
-
-  /* WALLET INTERFACE */
-  .wallet-pane {
-    padding: 24px;
-    border-right: 1px solid var(--border);
-  }
-
-  @media (min-width: 1024px) {
-    .wallet-pane {
-      padding: 40px;
-    }
-  }
-
-  /* HERO PORTFOLIO MODULE */
-  .hero-portfolio {
-    padding: 12px 0 32px 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 32px;
-  }
-
-  .portfolio-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .portfolio-amount {
-    font-size: clamp(38px, 6vw, 52px);
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    color: var(--text);
-    margin: 8px 0;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .uid-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--surface-hover);
-    padding: 6px 12px;
-    border-radius: 100px;
-    font-size: 12px;
-    color: var(--text-dim);
-    font-weight: 500;
-    cursor: pointer;
+  .card {
+    background: var(--card);
     border: 1px solid var(--border);
-    transition: all 0.15s ease;
+    border-radius: 20px; padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   }
 
-  .uid-pill:hover {
+  label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .input-group { position: relative; }
+
+  input {
+    width: 100%; padding: 18px; border-radius: 12px;
+    border: 1px solid var(--border);
     background: #f1f5f9;
-    color: var(--text);
+    color: var(--text); font-size: 18px; font-weight: 700;
+    outline: none; transition: all 0.2s;
   }
 
-  /* MODERN NATIVE CTA ACTION BAR */
-  .action-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 24px;
-    max-width: 380px;
+  input:focus { border-color: var(--pri); background: #ffffff; box-shadow: 0 0 0 4px rgba(0, 82, 255, 0.1); }
+
+  .currency-tag { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-dim); }
+
+  #usdtInfo {
+    margin: 15px 0; padding: 12px; border-radius: 10px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #059669; font-weight: 700; text-align: center;
+    display: none; /* Hidden until calculation */
   }
 
-  .action-btn {
-    cursor: pointer;
-    border: none;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 15px;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .action-btn:active {
-    transform: scale(0.98);
-  }
-
-  .action-btn-primary {
+  .btn {
+    width: 100%; padding: 16px; border: none; border-radius: 12px;
+    font-weight: 700; font-size: 16px;
     background: var(--pri);
-    color: #ffffff;
+    color: #fff; cursor: pointer; transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 82, 255, 0.2);
+    margin-top: 5px;
   }
 
-  .action-btn-primary:hover {
-    background: var(--pri-hover);
-  }
+  .btn:active { transform: scale(0.97); }
 
-  .action-btn-secondary {
-    background: var(--surface-hover);
-    color: var(--text);
-    border: 1px solid var(--border-dark);
-  }
-
-  .action-btn-secondary:hover {
-    background: #e2e8f0;
-  }
-
-  /* LIST OF ASSETS */
-  .section-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  .asset-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    background: var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .asset-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px;
-    background: var(--surface);
-    transition: background-color 0.15s ease;
-  }
-
-  .asset-row:hover {
-    background-color: var(--surface-hover);
-  }
-
-  .asset-detail {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .asset-brand-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 18px;
-  }
-
-  .asset-symbol {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .asset-name {
-    font-size: 13px;
-    color: var(--text-dim);
-    font-weight: 500;
-    margin-top: 2px;
-  }
-
-  .asset-balance-val {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* SIDE PANEL / SECURITY CENTER */
-  .side-pane {
-    padding: 24px;
-    background: #fcfdfe;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  @media (min-width: 1024px) {
-    .side-pane {
-      padding: 40px;
-    }
-  }
-
-  .security-card {
-    background: var(--surface);
-    border: 1px solid var(--border-dark);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
-  }
-
-  .security-card-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .security-item {
-    background: var(--surface-hover);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-
-  .security-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .security-heading {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  .security-desc {
-    font-size: 12px;
-    color: var(--text-dim);
+  .note {
+    margin-top: 20px; font-size: 13px; color: var(--text-dim);
+    padding-top: 15px; border-top: 1px solid var(--border);
     line-height: 1.5;
-    display: block;
-    margin-bottom: 12px;
   }
 
-  .action-link-btn {
-    width: 100%;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border-dark);
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
+  .note strong { color: var(--text); }
+
+  footer {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around;
+    padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
   }
 
-  .action-link-btn:hover {
-    background: #f1f5f9;
+  .fitem { color: var(--text-dim); text-decoration: none; font-weight: 700; font-size: 12px; }
+  .active { color: var(--pri); }
+
+  /* Reviews Modal Styling */
+  .reviews-trigger-btn {
+    background: #ecfdf5; color: #059669; font-weight: 700; font-size: 12px;
+    padding: 6px 12px; border-radius: 20px; border: 1px solid #a7f3d0; cursor: pointer;
   }
 
-  .footer-meta {
-    text-align: center;
-    margin-top: auto;
-    padding-top: 24px;
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 100;
   }
 
-  .footer-text {
-    font-size: 11px;
-    color: var(--text-dim);
-    font-weight: 500;
+  .modal-box {
+    background: #fff; border-radius: 20px; width: 90%; max-width: 440px; padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: modalUp 0.2s ease;
+    max-height: 80vh; display: flex; flex-direction: column;
   }
+
+  @keyframes modalUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .modal-head h3 { margin: 0; font-size: 16px; font-weight: 800; }
+  .close-btn { background: none; border: none; font-size: 22px; font-weight: 800; cursor: pointer; color: var(--text-dim); }
+
+  .rating-score { font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: 10px; }
+
+  .review-filters { display: flex; gap: 8px; margin-bottom: 12px; }
+  .filter-chip {
+    padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 700;
+    background: #f1f5f9; color: var(--text-dim); border: none; cursor: pointer;
+  }
+  .filter-chip.active { background: #0052ff; color: #fff; }
+
+  .review-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding-right: 4px; }
+  .review-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  .review-user { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .user-name { font-weight: 700; color: var(--text); }
+  .review-time { color: var(--text-dim); font-size: 11px; }
+  .tag-good { color: #10b981; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .tag-bad { color: #ef4444; background: #fef2f2; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .review-text { font-size: 13px; color: var(--text); line-height: 1.4; }
 </style>
 </head>
 <body>
-<div class="shell">
-  <header>
-    <div class="brand">
-      <!-- Updated Logo Element -->
-      <div class="logo">₿</div>
-      <strong>NexPay <span style="font-size:12px; color:var(--text-dim); font-weight:normal;"></span></strong>
+
+<div class="wrap">
+  <h2>Buy USDT</h2>
+  <div class="seller">
+    <span>Seller • <strong> ASPFIY </strong></span>
+    <button class="reviews-trigger-btn" onclick="openReviews()">★ Reviews (26)</button>
+  </div>
+
+  <div class="card">
+    <label for="amount">Amount (₦8,764 – ₦300,000)</label>
+    <div class="input-group">
+      <input id="amount" type="number" inputmode="numeric" pattern="\d*" placeholder="0.00" oninput="calcUSDT()"/>
+      <span class="currency-tag">NGN</span>
     </div>
-    <div class="header-actions">
-      <span class="badge">
-        <span class="badge-dot"></span>
-        Online
-      </span>
-      <button id="logout" class="logout-btn">Logout</button>
+
+    <div id="usdtInfo"></div>
+
+    <button class="btn" onclick="proceed()">Buy USDT</button>
+
+    <div class="note">
+      <strong>Seller’s note:</strong><br>
+      <em>Send the exact Amount and upload your receipt for fast release.</em>
     </div>
-  </header>
-
-  <main class="main-layout">
-    <!-- WALLET PANE -->
-    <section class="wallet-pane">
-      <div class="hero-portfolio">
-        <span class="portfolio-label">Total Portfolio Value</span>
-        <div id="balance" class="portfolio-amount">€548.74</div>
-        <div class="uid-pill" id="copy-uid">
-          <span id="uid-text">UID: Click to copy account UID</span>
-        </div>
-
-        <div class="action-grid">
-          <!-- Button styled in updated primary orange -->
-          <a href="./p2p.html" class="action-btn action-btn-primary">Buy / Sell</a>
-          <a href="./send.html" class="action-btn action-btn-secondary">Send Assets</a>
-        </div>
-      </div>
-
-      <span class="section-title">Your Assets</span>
-      <div class="asset-list">
-        <!-- BTC -->
-        <div class="asset-row">
-          <div class="asset-detail">
-            <div class="asset-brand-icon" style="color: #f7931a; background: rgba(247,147,26,0.1);">₿</div>
-            <div>
-              <div class="asset-symbol">BTC</div>
-              <div class="asset-name">Bitcoin</div>
-            </div>
-          </div>
-          <div class="asset-balance-val" id="btc-balance">0.0098</div>
-        </div>
-        <!-- ETH -->
-        <div class="asset-row">
-          <div class="asset-detail">
-            <div class="asset-brand-icon" style="color: #627eea; background: rgba(98,126,234,0.1);">Ξ</div>
-            <div>
-              <div class="asset-symbol">ETH</div>
-              <div class="asset-name">Ethereum</div>
-            </div>
-          </div>
-          <div class="asset-balance-val">0.0000</div>
-        </div>
-        <!-- USDT -->
-        <div class="asset-row">
-          <div class="asset-detail">
-            <div class="asset-brand-icon" style="color: #26a17b; background: rgba(38,161,123,0.1);">₮</div>
-            <div>
-              <div class="asset-symbol">USDT</div>
-              <div class="asset-name">Tether</div>
-            </div>
-          </div>
-          <div class="asset-balance-val">0.00</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SIDE PANEL (SECURITY CENTER) -->
-    <aside class="side-pane">
-      <div class="security-card">
-        <span class="security-card-title">Device Security & Configuration</span>
-        
-        <div class="security-item">
-          <strong class="security-heading">Secret Recovery Phrase</strong>
-          <span class="security-desc">Copy your master recovery key. Keep it backed up offline to maintain direct asset ownership.</span>
-          <button class="action-link-btn" id="copy">Copy Keyphrase</button>
-        </div>
-
-        <div class="security-item">
-          <strong class="security-heading">Device Security</strong>
-          <span class="security-desc">Binding active on this browser</span>
-          <button class="action-link-btn" onclick="alert('Demo Action')">Security Settings</button>
-        </div>
-      </div>
-
-      <div class="footer-meta">
-        <span class="footer-text">© <span id="y"></span> NexPay Global Inc. • Demo Environment • All Transmissions Encrypted</span>
-      </div>
-    </aside>
-  </main>
+  </div>
 </div>
 
+<!-- Reviews Modal -->
+<div class="modal-overlay" id="reviewsModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Seller Reviews</h3>
+      <button class="close-btn" onclick="closeReviews()">&times;</button>
+    </div>
+
+    <div class="rating-score">80.77% Positive Rating (26 Total)</div>
+
+    <div class="review-filters">
+      <button class="filter-chip active" onclick="filterReviews('all', this)">All (26)</button>
+      <button class="filter-chip" onclick="filterReviews('good', this)">Good (21)</button>
+      <button class="filter-chip" onclick="filterReviews('bad', this)">Bad (5)</button>
+    </div>
+
+    <div class="review-list" id="reviewList">
+      <!-- Generated via JS -->
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a class="fitem active" href="p2p.html">P2P Market</a>
+  <a class="fitem" href="order.html">My Orders</a>
+</footer>
+
 <script>
-  const balanceEl = document.getElementById("balance");
-  const btcEl = document.getElementById("btc-balance");
-  const uidTextEl = document.getElementById("uid-text");
+const reviewsData = [
+  // 21 Good Reviews
+  { type: 'good', name: 'CryptoKing**', time: '2 mins ago', text: 'Fast transaction, released immediately!' },
+  { type: 'good', name: 'User_8921', time: '10 mins ago', text: 'Extremely fast release. Recommended seller.' },
+  { type: 'good', name: 'NaijaTrader', time: '25 mins ago', text: 'Good service, no payment delay.' },
+  { type: 'good', name: 'Dave_FX', time: '1 hour ago', text: 'Fast release, very trustworthy.' },
+  { type: 'good', name: 'Emeka_P2P', time: '2 hours ago', text: 'Seamless payment processing, thanks!' },
+  { type: 'good', name: 'Blessed_01', time: '3 hours ago', text: 'Fast release, top tier merchant.' },
+  { type: 'good', name: 'StarBoy_99', time: '4 hours ago', text: 'Quick response on chat and prompt release.' },
+  { type: 'good', name: 'Tunde_V', time: '5 hours ago', text: 'Very fast and smooth execution.' },
+  { type: 'good', name: 'ApexTrades', time: '6 hours ago', text: 'Fast release as promised.' },
+  { type: 'good', name: 'Zainab_M', time: '7 hours ago', text: 'Super fast trade! Will buy again.' },
+  { type: 'good', name: 'Kalu_X', time: '8 hours ago', text: 'Fast and secure process.' },
+  { type: 'good', name: 'Sammy_B', time: '10 hours ago', text: 'Instant coin release after receipt upload.' },
+  { type: 'good', name: 'Victor_33', time: '12 hours ago', text: 'Prompt and reliable seller.' },
+  { type: 'good', name: 'Grace_L', time: '14 hours ago', text: 'Fast release, pleasant transaction.' },
+  { type: 'good', name: 'Mike_Pro', time: '15 hours ago', text: 'Super swift execution.' },
+  { type: 'good', name: 'Bola_88', time: '18 hours ago', text: 'Fast. No complaints at all.' },
+  { type: 'good', name: 'John_Doe', time: '20 hours ago', text: 'Reliable and fast seller.' },
+  { type: 'good', name: 'CryptoGuru', time: '1 day ago', text: 'Smooth process and quick release.' },
+  { type: 'good', name: 'Chidi_O', time: '1 day ago', text: 'Very swift transaction.' },
+  { type: 'good', name: 'Amina_K', time: '1 day ago', text: 'Fast response and fast coin release.' },
+  { type: 'good', name: 'Paul_R', time: '2 days ago', text: 'Fast release, highly reliable merchant.' },
 
-  const phrase = localStorage.getItem("nexpay_phrase") || "";
+  // 5 Bad Reviews
+  { type: 'bad', name: 'Hater_01', time: '4 hours ago', text: 'Delayed release for almost 10 minutes.' },
+  { type: 'bad', name: 'SlowPayer', time: '11 hours ago', text: 'Took too long to verify the bank receipt.' },
+  { type: 'bad', name: 'Anon_998', time: '1 day ago', text: 'Seller was slow to reply in chat.' },
+  { type: 'bad', name: 'Trader_X2', time: '2 days ago', text: 'Payment verification took extra time.' },
+  { type: 'bad', name: 'User_404', time: '3 days ago', text: 'Slight delay during peak banking hours.' }
+];
 
-  const WHITELISTED_UIDS = ["258231055", "155653587"];
-  const upgradeAmount = 548.74;
-  const upgradeBtc = 0.0098;
+function renderReviews(filter = 'all') {
+  const container = document.getElementById('reviewList');
+  container.innerHTML = '';
+  
+  const filtered = reviewsData.filter(r => filter === 'all' || r.type === filter);
+  
+  filtered.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    card.innerHTML = `
+      <div class="review-user">
+        <span class="user-name">${r.name}</span>
+        <span class="${r.type === 'good' ? 'tag-good' : 'tag-bad'}">${r.type === 'good' ? '👍 Positive' : '👎 Negative'}</span>
+      </div>
+      <div class="review-text">${r.text}</div>
+      <div class="review-time">${r.time}</div>
+    `;
+    container.appendChild(card);
+  });
+}
 
-  let currentUid = localStorage.getItem("nexpay_uid");
-  if (currentUid && uidTextEl) {
-    uidTextEl.textContent = `UID: ${currentUid}`;
+function filterReviews(type, btn) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews(type);
+}
+
+function openReviews() {
+  document.getElementById('reviewsModal').style.display = 'flex';
+}
+
+function closeReviews() {
+  document.getElementById('reviewsModal').style.display = 'none';
+}
+
+// Initial Render
+renderReviews('all');
+
+function calcUSDT(){
+  const amt = parseInt(document.getElementById('amount').value, 10);
+  const info = document.getElementById('usdtInfo');
+  if(!isNaN(amt) && amt >= 8764 && amt <= 300000){
+    const usdt = (amt / 1380).toFixed(2);
+    info.style.display = "block";
+    info.textContent = `You receive ≈ ${usdt} USDT`;
+  } else {
+    info.style.display = "none";
+  }
+}
+
+function proceed(){
+  const amt = parseInt(document.getElementById('amount').value, 10);
+  if(isNaN(amt) || amt < 8764 || amt > 300000){
+    alert("Please enter an amount between ₦8,764and ₦300,000.");
+    return;
   }
 
-  const isWhitelisted = WHITELISTED_UIDS.includes(currentUid);
+  const order = {
+    id: 'ORD-'+Date.now(),
+    seller: 'ASPFIY',
+    amount: amt,
+    stage: 'make_payment',
+    stageEndAt: Date.now() + 15*60*1000,
+    messages: [],
+    autoReplySent: false,
+    createdAt: Date.now(),
+    status: 'In Progress'
+  };
 
-  if(localStorage.getItem("balanceUpgraded") === "true"){
-    balanceEl.textContent = `€${upgradeAmount.toFixed(2)}`;
-    btcEl.textContent = upgradeBtc.toFixed(4);
-  }
+  localStorage.setItem('currentP2POrder', JSON.stringify(order));
+  const list = JSON.parse(localStorage.getItem('orders') || '[]');
+  list.unshift({id:order.id, seller:order.seller, amount:order.amount, status:'In Progress', createdAt:order.createdAt});
+  localStorage.setItem('orders', JSON.stringify(list));
 
-  function runUpgrade(){
-    let start = 0; let end = upgradeAmount; let duration = 4000; let startTime = null;
-    function animateBalance(timestamp){
-      if(!startTime) startTime = timestamp;
-      let progress = Math.min((timestamp - startTime) / duration, 1);
-      balanceEl.textContent = `€${(start + (end - start) * progress).toFixed(2)}`;
-      btcEl.textContent = (upgradeBtc * progress).toFixed(4);
-      if(progress < 1) requestAnimationFrame(animateBalance);
-      else localStorage.setItem("balanceUpgraded", "true");
+  location.href='payment.html';
+}
+
+// Session Timer Logic
+const TIMEOUT_DURATION = 60000;
+function checkSession() {
+    const lastActive = localStorage.getItem('lastActiveTime');
+    if (lastActive && (Date.now() - parseInt(lastActive) >= TIMEOUT_DURATION)) {
+        localStorage.removeItem('lastActiveTime');
+        window.location.href = 'pin.html';
     }
-    requestAnimationFrame(animateBalance);
-  }
-
-  if(isWhitelisted && localStorage.getItem("balanceUpgraded") !== "true") runUpgrade();
-
-  document.getElementById('copy').addEventListener('click', async ()=>{
-    try { 
-      if (!phrase) {
-        alert('No recovery phrase found in local storage.');
-        return;
-      }
-      await navigator.clipboard.writeText(phrase); 
-      alert('Phrase copied successfully.'); 
-    } catch(e){}
-  });
-
-  document.getElementById('copy-uid').addEventListener('click', async ()=>{
-    let uid = localStorage.getItem("nexpay_uid") || Math.floor(100000000 + Math.random() * 900000000).toString();
-    localStorage.setItem("nexpay_uid", uid);
-    if (uidTextEl) uidTextEl.textContent = `UID: ${uid}`;
-    try {
-      await navigator.clipboard.writeText(uid);
-      const alertBox = document.createElement('div');
-      alertBox.textContent = `✅ UID copied.`;
-      Object.assign(alertBox.style, { 
-        position: "fixed", 
-        bottom: "20px", 
-        left: "50%", 
-        transform: "translateX(-50%)", 
-        background: "linear-gradient(135deg, #f7931a, #e18617)", 
-        color: "#ffffff", 
-        padding: "14px 24px", 
-        borderRadius: "14px", 
-        fontWeight: "700", 
-        zIndex: "9999",
-        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)"
-      });
-      document.body.appendChild(alertBox);
-      setTimeout(()=>alertBox.remove(), 2500);
-    } catch(e){}
-  });
-
-  document.getElementById('logout').addEventListener('click', ()=>{
-    if(confirm('Please confirm that you have safely backed up your Secret Recovery Phrase. Continue?')) {
-      location.href='index.html';
-    }
-  });
-
-  document.getElementById('y').textContent = new Date().getFullYear();
-
-  const TIMEOUT_DURATION = 60000;
-  function checkSession() {
-      const lastActive = localStorage.getItem('lastActiveTime');
-      if (lastActive && (Date.now() - parseInt(lastActive) >= TIMEOUT_DURATION)) {
-          localStorage.removeItem('lastActiveTime');
-          window.location.href = 'pin.html';
-      }
-  }
-  function resetTimer() { localStorage.setItem('lastActiveTime', Date.now().toString()); }
-  ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(e => document.addEventListener(e, resetTimer));
-  checkSession(); setInterval(checkSession, 2000);
+}
+function resetTimer() { localStorage.setItem('lastActiveTime', Date.now().toString()); }
+['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(ev => document.addEventListener(ev, resetTimer));
+checkSession();
+setInterval(checkSession, 2000);
 </script>
+
 </body>
 </html>
