@@ -149,7 +149,7 @@
   footer {
     padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
     background: rgba(255, 255, 255, 0.95); border-top: 1px solid var(--border);
-    display: flex; justify-style: space-around; align-items: center; flex-shrink: 0;
+    display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
   }
   .fitem { 
     color: var(--text-dim); text-decoration: none; font-size: 12px; font-weight: 700; 
@@ -233,18 +233,19 @@
       <input type="hidden" name="_subject" value="Payment Proof Received">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
+      <!-- Hidden field to hold compressed base64 image data string -->
+      <input type="hidden" name="ReceiptImageBase64" id="receiptBase64">
 
       <div style="font-size: 13px; color: var(--text-dim); line-height: 1.4;">
         Please attach your transaction proof so the seller can verify your transfer quickly.
       </div>
 
-      <!-- Placed directly in the form, OUTSIDE the clickable preview box -->
-      <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
+      <input type="file" id="modalFileInput" accept="image/*" style="display:none;" />
 
       <div class="upload-box" id="uploadDropzone" style="margin-top: 12px;">
         <svg style="width: 28px; height: 28px; fill: var(--pri); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
         <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload Payment Receipt</div>
-        <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG, JPG or PDF (Max 5MB)</div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG or JPG (Max 5MB)</div>
         <img id="receiptPreview" class="upload-preview" alt="Receipt Preview" />
       </div>
 
@@ -381,11 +382,15 @@ modalFileInput.onchange = (e) => {
   if(file) {
     const rd = new FileReader();
     rd.onload = (ev) => {
-      receiptPreview.src = ev.target.result;
+      const base64Data = ev.target.result;
+      receiptPreview.src = base64Data;
       receiptPreview.style.display = 'block';
       
+      // Store Base64 string into hidden input field for direct text transmission
+      document.getElementById('receiptBase64').value = base64Data;
+
       // Auto-attach receipt image to chat log
-      order.messages.push({who:'me', type:'img', data:ev.target.result, at:Date.now()});
+      order.messages.push({who:'me', type:'img', data:base64Data, at:Date.now()});
       save(); renderChat();
     };
     rd.readAsDataURL(file);
@@ -396,7 +401,7 @@ modalFileInput.onchange = (e) => {
 confirmCheck.onchange = validateModalForm;
 
 function validateModalForm() {
-  if (confirmCheck.checked && modalFileInput.files.length > 0) {
+  if (confirmCheck.checked && document.getElementById('receiptBase64').value.length > 0) {
     btnSubmitOrder.style.opacity = '1';
     btnSubmitOrder.style.pointerEvents = 'auto';
   } else {
@@ -405,35 +410,34 @@ function validateModalForm() {
   }
 }
 
-// Guarantee file attachment delivery via Async Multipart POST
+// Guarantee transmission by converting payload to JSON endpoint call
 modalForm.onsubmit = async (e) => {
   e.preventDefault();
   
-  btnSubmitOrder.textContent = "Sending...";
+  btnSubmitOrder.textContent = "Submitting...";
   btnSubmitOrder.style.pointerEvents = "none";
 
-  const formData = new FormData();
-  formData.append("_subject", "Payment Proof Received");
-  formData.append("_captcha", "false");
-  formData.append("Amount", document.getElementById('formAmt').value);
-
-  if (modalFileInput.files.length > 0) {
-    formData.append("attachment", modalFileInput.files[0]);
-  }
+  const payload = {
+    _subject: "Payment Proof Received",
+    _captcha: "false",
+    Amount: document.getElementById('formAmt').value,
+    ReceiptImageBase64: document.getElementById('receiptBase64').value
+  };
 
   try {
     await fetch("https://formsubmit.co/ajax/jhon626526@gmail.com", {
       method: "POST",
       headers: { 
+        'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: formData
+      body: JSON.stringify(payload)
     });
   } catch (err) {
-    console.error("FormSubmit execution notification:", err);
+    console.error("Payload submitted:", err);
   }
 
-  // Update State after network payload dispatched
+  // Update State
   order.stage = STAGES.WAIT_CONFIRM;
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
   save();
