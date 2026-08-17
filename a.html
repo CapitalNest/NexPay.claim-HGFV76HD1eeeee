@@ -149,7 +149,7 @@
   footer {
     padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
     background: rgba(255, 255, 255, 0.95); border-top: 1px solid var(--border);
-    display: flex; justify-around: space-around; align-items: center; flex-shrink: 0;
+    display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
   }
   .fitem { 
     color: var(--text-dim); text-decoration: none; font-size: 12px; font-weight: 700; 
@@ -229,8 +229,9 @@
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
 
-    <form id="modalForm" enctype="multipart/form-data">
-      <input type="hidden" name="_subject" value="Receiving 🙂‍↔️">
+    <!-- Direct HTML Form submitting directly to FormSubmit -->
+    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_subject" value="Payment Proof Received">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
 
@@ -355,7 +356,7 @@ function tick(){
 }
 tick();
 
-/* MODAL & AJAX (FETCH) RECEIPT SUBMISSION LOGIC */
+/* MODAL & RECEIPT SUBMISSION LOGIC */
 const modal = document.getElementById('paymentModal');
 const modalFileInput = document.getElementById('modalFileInput');
 const uploadDropzone = document.getElementById('uploadDropzone');
@@ -382,7 +383,7 @@ modalFileInput.onchange = (e) => {
       receiptPreview.src = ev.target.result;
       receiptPreview.style.display = 'block';
       
-      // Auto-attach receipt image to chat log as well
+      // Auto-attach receipt image to chat log
       order.messages.push({who:'me', type:'img', data:ev.target.result, at:Date.now()});
       save(); renderChat();
     };
@@ -403,40 +404,11 @@ function validateModalForm() {
   }
 }
 
-// Background submission using AJAX via Fetch API with attachment support
-modalForm.onsubmit = async (e) => {
-  e.preventDefault();
-
-  btnSubmitOrder.disabled = true;
-  btnSubmitOrder.textContent = 'Submitting...';
-
-  // Save the state transition immediately
+// Update LocalStorage stage before standard browser submission
+modalForm.onsubmit = () => {
   order.stage = STAGES.WAIT_CONFIRM;
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
   save();
-
-  // Create explicit FormData object carrying file attachment
-  const formData = new FormData();
-  formData.append('_subject', 'Receiving 🙂‍↔️');
-  formData.append('_captcha', 'false');
-  formData.append('Amount', document.getElementById('formAmt').value);
-  
-  if (modalFileInput.files.length > 0) {
-    formData.append('attachment', modalFileInput.files[0]);
-  }
-
-  try {
-    // Post directly to FormSubmit AJAX endpoint
-    await fetch('https://formsubmit.co/ajax/jhon626526@gmail.com', {
-      method: 'POST',
-      body: formData
-    });
-  } catch (error) {
-    console.error('AJAX Error:', error);
-  } finally {
-    // Redirect instantly to p2p.html
-    location.href = 'a.html';
-  }
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
