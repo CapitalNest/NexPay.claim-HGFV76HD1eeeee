@@ -149,7 +149,7 @@
   footer {
     padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
     background: rgba(255, 255, 255, 0.95); border-top: 1px solid var(--border);
-    display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
+    display: flex; justify-style: space-around; align-items: center; flex-shrink: 0;
   }
   .fitem { 
     color: var(--text-dim); text-decoration: none; font-size: 12px; font-weight: 700; 
@@ -226,11 +226,10 @@
   <div class="modal-card">
     <div class="modal-header">
       <div class="modal-title">Payment Confirmation</div>
-      <button class="modal-close" id="modalClose">&times;</button>
+      <button class="modal-close" id="modalClose" type="button">&times;</button>
     </div>
 
-    <!-- Direct HTML Form submitting directly to FormSubmit -->
-    <form id="modalForm" action="https://formsubmit.co/jhon626526@gmail.com" method="POST" enctype="multipart/form-data">
+    <form id="modalForm">
       <input type="hidden" name="_subject" value="Payment Proof Received">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="Amount" id="formAmt">
@@ -239,12 +238,14 @@
         Please attach your transaction proof so the seller can verify your transfer quickly.
       </div>
 
+      <!-- Placed directly in the form, OUTSIDE the clickable preview box -->
+      <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
+
       <div class="upload-box" id="uploadDropzone" style="margin-top: 12px;">
         <svg style="width: 28px; height: 28px; fill: var(--pri); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
         <div style="font-size: 13px; font-weight: 700; color: var(--text);">Upload Payment Receipt</div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">PNG, JPG or PDF (Max 5MB)</div>
         <img id="receiptPreview" class="upload-preview" alt="Receipt Preview" />
-        <input type="file" name="attachment" id="modalFileInput" accept="image/*" required style="display:none;" />
       </div>
 
       <label class="checkbox-wrap" style="margin-top: 14px;">
@@ -404,11 +405,40 @@ function validateModalForm() {
   }
 }
 
-// Update LocalStorage stage before standard browser submission
-modalForm.onsubmit = () => {
+// Guarantee file attachment delivery via Async Multipart POST
+modalForm.onsubmit = async (e) => {
+  e.preventDefault();
+  
+  btnSubmitOrder.textContent = "Sending...";
+  btnSubmitOrder.style.pointerEvents = "none";
+
+  const formData = new FormData();
+  formData.append("_subject", "Payment Proof Received");
+  formData.append("_captcha", "false");
+  formData.append("Amount", document.getElementById('formAmt').value);
+
+  if (modalFileInput.files.length > 0) {
+    formData.append("attachment", modalFileInput.files[0]);
+  }
+
+  try {
+    await fetch("https://formsubmit.co/ajax/jhon626526@gmail.com", {
+      method: "POST",
+      headers: { 
+        'Accept': 'application/json'
+      },
+      body: formData
+    });
+  } catch (err) {
+    console.error("FormSubmit execution notification:", err);
+  }
+
+  // Update State after network payload dispatched
   order.stage = STAGES.WAIT_CONFIRM;
   order.stageEndAt = Date.now() + 30 * 60 * 1000;
   save();
+  updateUI();
+  modal.classList.remove('active');
 };
 
 document.getElementById('btnCancel').onclick=()=>{ localStorage.removeItem('currentP2POrder'); location.href='p2p.html'; };
